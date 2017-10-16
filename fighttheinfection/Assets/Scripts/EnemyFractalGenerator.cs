@@ -46,6 +46,7 @@ public class EnemyFractalGenerator : MonoBehaviour {
         {
             gameObject.AddComponent<MeshFilter>().mesh = meshes[Random.Range(0, meshes.Length)];
             gameObject.AddComponent<MeshRenderer>().material = materials[Random.Range(0, materials.Length)];
+            transform.rotation = Quaternion.Euler(0, -45, 0);
         }
         else
         {
@@ -89,7 +90,7 @@ public class EnemyFractalGenerator : MonoBehaviour {
         transform.parent = parent.transform;
         transform.localScale = Vector3.one * childScale;
         transform.localPosition = childDirections[childIndex] * (0.5f + 0.5f * childScale);
-        //transform.localRotation = childOrientation[childIndex];
+        transform.rotation = parent.transform.rotation;
         if(populate)
         {
             Populate();

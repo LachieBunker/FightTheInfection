@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour {
     {
         float escapes = numRecentEnemyEscapes;
         float cap = numRecentEnemiesCounted;
-        Debug.Log(escapes/cap);
+        //Debug.Log(escapes/cap);
         infectionLevel = (float)(escapes / cap) * 100;
     }
 
@@ -225,6 +225,10 @@ public class GameManager : MonoBehaviour {
         if(currentLives > 0)
         {
             RespawnPlayer();
+        }
+        else if(currentLives <= 0)
+        {
+            GameOver("Lost");
         }
     }
 

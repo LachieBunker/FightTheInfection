@@ -62,7 +62,7 @@ public class PlayerController : BaseCharacterClass {
 
     public void Attack()
     {
-        GameObject bullet = (GameObject)Instantiate(bulletPrefab, new Vector3(transform.position.x + 1, transform.position.y, transform.position.z), Quaternion.identity);
+        GameObject bullet = (GameObject)Instantiate(bulletPrefab, new Vector3(transform.position.x + 1, transform.position.y, transform.position.z), Quaternion.Euler(0, 90, 0));
         bullet.GetComponent<BulletScript>().damage = damage;
     }
 

@@ -28,10 +28,12 @@ public class BulletScript : MonoBehaviour {
         if(other.tag == "Player" && gameObject.tag == "EnemyBullet")
         {
             other.GetComponent<PlayerController>().CharacterHit(damage);
+            Destroy(gameObject);
         }
         if(other.tag == "Enemy" && gameObject.tag == "PlayerBullet")
         {
             other.GetComponent<EnemyClass>().CharacterHit(damage);
+            Destroy(gameObject);
         }
     }
 }

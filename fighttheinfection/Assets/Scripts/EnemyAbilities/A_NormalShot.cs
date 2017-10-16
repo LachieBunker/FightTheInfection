@@ -40,6 +40,6 @@ public class A_NormalShot : BaseEnemyAbilityClass {
 
     public override void Activate(GameObject _player, GameObject _bullet)
     {
-        GameObject bullet = (GameObject)Instantiate(_bullet, new Vector3(transform.position.x - 1, transform.position.y, transform.position.z), Quaternion.identity);
+        GameObject bullet = (GameObject)Instantiate(_bullet, new Vector3(transform.position.x - 1, transform.position.y, transform.position.z), Quaternion.Euler(0, 90, 0));
     }
 }

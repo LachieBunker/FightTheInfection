@@ -84,4 +84,13 @@ public class EnemyClass : BaseCharacterClass {
         GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EnemyRemoved("Dead");
         Destroy(gameObject);
     }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.transform.tag == "Player")
+        {
+            other.GetComponent<PlayerController>().CharacterHit(damage);
+            CharacterHit(1);
+        }
+    }
 }
