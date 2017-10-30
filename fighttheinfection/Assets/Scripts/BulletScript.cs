@@ -5,7 +5,9 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour {
 
     public float moveSpeed;
+    public float rotSpeed;
     public int damage;
+    public GameObject bulletObj;
 
 	// Use this for initialization
 	void Start () {
@@ -16,6 +18,7 @@ public class BulletScript : MonoBehaviour {
 	void Update ()
     {
         transform.Translate(Vector3.forward * moveSpeed);
+        bulletObj.transform.Rotate(0, rotSpeed, 0, Space.Self);
 	}
 
     public void DelayStart(float delay)

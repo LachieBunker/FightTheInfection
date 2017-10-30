@@ -7,16 +7,16 @@ public class EnemyFractalGenerator : MonoBehaviour {
     public bool populate;
     public int difficulty;
     public int maxDepth;
-    private int depth;
+    private int depth = -1;
     public float childScale;
 
-    public Mesh mesh;
+    public GameObject shapeObject;
     public Material material;
 
-    private static Vector3[] childDirections = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
-    private static Quaternion[] childOrientation = { Quaternion.Euler(0f, 0f, -90f), Quaternion.Euler(0f, 0f, 90f), Quaternion.Euler(90f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f) };
+    public Vector3[] childDirections;// = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
+    public Quaternion[] childOrientation;// = { Quaternion.Euler(0f, 0f, -90f), Quaternion.Euler(0f, 0f, 90f), Quaternion.Euler(90f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f) };
 
-    public Mesh[] meshes;
+    public GameObject[] shapes;
     public Material[] materials;
 
     // Use this for initialization
@@ -42,15 +42,15 @@ public class EnemyFractalGenerator : MonoBehaviour {
 
     public void Populate()
     {
-        if (depth == 0)
+        if (depth == -1)
         {
-            gameObject.AddComponent<MeshFilter>().mesh = meshes[Random.Range(0, meshes.Length)];
-            gameObject.AddComponent<MeshRenderer>().material = materials[Random.Range(0, materials.Length)];
+            //gameObject.AddComponent<MeshFilter>().mesh = shapes[Random.Range(0, shapes.Length)];
+            //gameObject.AddComponent<MeshRenderer>().material = materials[Random.Range(0, materials.Length)];
             transform.rotation = Quaternion.Euler(0, -45, 0);
         }
         else
         {
-            gameObject.AddComponent<MeshFilter>().mesh = mesh;
+            //gameObject.AddComponent<MeshFilter>().mesh = shapeObject;
             gameObject.AddComponent<MeshRenderer>().material = material;
         }
 
@@ -62,12 +62,20 @@ public class EnemyFractalGenerator : MonoBehaviour {
 
     private void CreateChildren()
     {
-        Mesh childMesh = meshes[Random.Range(0, meshes.Length)];
+        GameObject childMesh = shapes[Random.Range(0, shapes.Length)];
         Material childMat = materials[Random.Range(0, materials.Length)];
-        for (int i = 0; i < childDirections.Length; i++)
+        if(depth == -1)
         {
-            new GameObject("Fractal Child").AddComponent<EnemyFractalGenerator>().Initialize(this, i, childMesh, childMat, true);
+            Instantiate(childMesh, transform.position, Quaternion.identity).GetComponent<EnemyFractalGenerator>().InitializeBaseFractal(this, childMesh, childMat, true);
         }
+        else
+        {
+            for (int i = 0; i < childDirections.Length; i++)
+            {
+                Instantiate(childMesh, transform.position, Quaternion.identity).GetComponent<EnemyFractalGenerator>().Initialize(this, i, childMesh, childMat, true);
+            }
+        }
+        
     }
 
     public void SetValues(int _diffLevel, bool _populate)
@@ -77,21 +85,39 @@ public class EnemyFractalGenerator : MonoBehaviour {
         populate = _populate;
     }
 
-    private void Initialize(EnemyFractalGenerator parent, int childIndex, Mesh _mesh, Material _mat, bool _populate = false)
+    private void Initialize(EnemyFractalGenerator parent, int childIndex, GameObject _shape, Material _mat, bool _populate = false)
     {
         populate = _populate;
-        mesh = _mesh;
+        shapeObject = _shape;
         material = _mat;
-        meshes = parent.meshes;
+        shapes = parent.shapes;
         materials = parent.materials;
         maxDepth = parent.maxDepth;
         depth = parent.depth + 1;
         childScale = parent.childScale;
         transform.parent = parent.transform;
         transform.localScale = Vector3.one * childScale;
-        transform.localPosition = childDirections[childIndex] * (0.5f + 0.5f * childScale);
+        transform.localPosition = parent.childDirections[childIndex] * (0.5f + 0.5f * childScale);
         transform.rotation = parent.transform.rotation;
         if(populate)
+        {
+            Populate();
+        }
+    }
+
+    private void InitializeBaseFractal(EnemyFractalGenerator parent, GameObject _shape, Material _mat, bool _populate = false)
+    {
+        populate = _populate;
+        shapeObject = _shape;
+        material = _mat;
+        shapes = parent.shapes;
+        materials = parent.materials;
+        maxDepth = parent.maxDepth;
+        depth = parent.depth + 1;
+        childScale = parent.childScale;
+        transform.parent = parent.transform;
+        transform.rotation = parent.transform.rotation;
+        if (populate)
         {
             Populate();
         }
