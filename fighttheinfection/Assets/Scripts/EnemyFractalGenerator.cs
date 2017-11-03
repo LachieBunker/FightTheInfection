@@ -14,7 +14,7 @@ public class EnemyFractalGenerator : MonoBehaviour {
     public Material material;
 
     public Vector3[] childDirections;// = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
-    public Quaternion[] childOrientation;// = { Quaternion.Euler(0f, 0f, -90f), Quaternion.Euler(0f, 0f, 90f), Quaternion.Euler(90f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f) };
+    public ChildPos[] childPos;// = { Quaternion.Euler(0f, 0f, -90f), Quaternion.Euler(0f, 0f, 90f), Quaternion.Euler(90f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f) };
 
     public GameObject[] shapes;
     public Material[] materials;
@@ -72,7 +72,15 @@ public class EnemyFractalGenerator : MonoBehaviour {
         {
             for (int i = 0; i < childDirections.Length; i++)
             {
-                Instantiate(childMesh, transform.position, Quaternion.identity).GetComponent<EnemyFractalGenerator>().Initialize(this, i, childMesh, childMat, true);
+                if(depth <= 0)
+                {
+                    Instantiate(childMesh, childPos[i].transform, Quaternion.identity).GetComponent<EnemyFractalGenerator>().Initialize(this, i, childMesh, childMat, true);
+                }
+                else if(depth > 0 && childPos[i].transform.x >= 0)
+                {
+                    Instantiate(childMesh, childPos[i].transform, Quaternion.identity).GetComponent<EnemyFractalGenerator>().Initialize(this, i, childMesh, childMat, true);
+                }
+                
             }
         }
         
@@ -97,8 +105,9 @@ public class EnemyFractalGenerator : MonoBehaviour {
         childScale = parent.childScale;
         transform.parent = parent.transform;
         transform.localScale = Vector3.one * childScale;
-        transform.localPosition = parent.childDirections[childIndex] * (0.5f + 0.5f * childScale);
+        transform.localPosition = parent.childPos[childIndex].transform * (0.5f + 0.5f * childScale);
         transform.rotation = parent.transform.rotation;
+        transform.localRotation = Quaternion.Euler(parent.childPos[childIndex].orientation.x, parent.childPos[childIndex].orientation.y, parent.childPos[childIndex].orientation.z);
         if(populate)
         {
             Populate();
@@ -122,4 +131,11 @@ public class EnemyFractalGenerator : MonoBehaviour {
             Populate();
         }
     }
+}
+
+[System.Serializable]
+public struct ChildPos
+{
+    public Vector3 transform;
+    public Vector3 orientation;
 }
