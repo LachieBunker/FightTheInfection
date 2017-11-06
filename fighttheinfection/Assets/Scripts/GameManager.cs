@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour {
     public List<GameObject> possibleEnemySpawns;
     public float waveWaitDuration;
     public Vector3 waveSpawnPos;
+    public Vector3 waveSpawnSpacing;
     [Range(5,40)]
     public int waveSize;
     [Range(10,20)]
@@ -59,7 +60,7 @@ public class GameManager : MonoBehaviour {
     public void PreLevelSetup()
     {
         
-        int addEnemyFrequency = 0;
+        int addEnemyFrequency = 2;
         switch (difficultySetting)
         {
             case "Easy":
@@ -103,11 +104,13 @@ public class GameManager : MonoBehaviour {
         {
             for(int i = 1; i < numAbilities; i++)
             {
-                _abilities.Add(enemyAbilities[Random.Range(1, enemyAbilities.Count)]);
+                BaseEnemyAbilityClass ability = enemyAbilities[Random.Range(1, enemyAbilities.Count)];
+                enemy.AddComponent(ability.GetType());
             }
         }
-        _abilities.Add(enemyAbilities[0]);//Add default attack to list
-        enemy.GetComponent<EnemyClass>().SetEnemyAbilities(_abilities);
+        //_abilities.Add(enemyAbilities[0]);//Add default attack to list
+        enemy.AddComponent(enemyAbilities[0].GetType());
+        //enemy.GetComponent<EnemyClass>().SetEnemyAbilities(_abilities);
         GameObject fractal = GenerateEnemyFractal();
         fractal.transform.SetParent(enemy.transform);
         enemy.transform.SetParent(gameObject.transform);
@@ -138,7 +141,7 @@ public class GameManager : MonoBehaviour {
         {
             _numWaves--;
             SpawnWave();
-            yield return new WaitForSeconds(waveWaitDuration);
+            yield return new WaitForSeconds(waveWaitDuration);//make faster as level increases?
             if(!playing)
             {
                 break;
@@ -148,7 +151,7 @@ public class GameManager : MonoBehaviour {
         {
             LevelOver();
         }
-        //while num waves to spaen > 0
+        //while num waves to spawn > 0
             //tick down num waves to spawn
             //spawn wave
             //wait for wave wait duration
@@ -164,7 +167,7 @@ public class GameManager : MonoBehaviour {
         {
             for(int j = 0; j < 5; j++)
             {
-                GameObject temp = (GameObject)Instantiate(enemy, new Vector3(waveSpawnPos.x + (i * 2), waveSpawnPos.y, waveSpawnPos.z + (j * 2)), Quaternion.identity);
+                GameObject temp = (GameObject)Instantiate(enemy, new Vector3(waveSpawnPos.x + (i * waveSpawnSpacing.x), waveSpawnPos.y, waveSpawnPos.z + (j * waveSpawnSpacing.z)), Quaternion.identity);
                 temp.SetActive(true);
             }
         }
@@ -234,7 +237,8 @@ public class GameManager : MonoBehaviour {
 
     public void RespawnPlayer()
     {
-        Instantiate(playerPrefab, playerSpawnPos, Quaternion.identity);
+        GameObject _player = (GameObject)Instantiate(playerPrefab, playerSpawnPos, Quaternion.identity);
+        _player.GetComponent<PlayerController>().StartInvul();
     }
 
     public void UpdateUI()

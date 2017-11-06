@@ -18,7 +18,10 @@ public class BulletScript : MonoBehaviour {
 	void Update ()
     {
         transform.Translate(Vector3.forward * moveSpeed);
-        bulletObj.transform.Rotate(0, rotSpeed, 0, Space.Self);
+        if(bulletObj != null)
+        {
+            bulletObj.transform.Rotate(0, rotSpeed, 0, Space.Self);
+        }
 	}
 
     public void DelayStart(float delay)
@@ -28,6 +31,7 @@ public class BulletScript : MonoBehaviour {
 
     public void OnTriggerEnter(Collider other)
     {
+        Debug.Log(gameObject + " hit " + other);
         if(other.tag == "Player" && gameObject.tag == "EnemyBullet")
         {
             other.GetComponent<PlayerController>().CharacterHit(damage);
@@ -36,6 +40,16 @@ public class BulletScript : MonoBehaviour {
         if(other.tag == "Enemy" && gameObject.tag == "PlayerBullet")
         {
             other.GetComponent<EnemyClass>().CharacterHit(damage);
+            Destroy(gameObject);
+        }
+        if(other.tag == "EnemyBullet" && gameObject.tag == "PlayerBullet")
+        {
+            Destroy(other);
+            Destroy(gameObject);
+        }
+        if(other.tag == "PlayerBullet" && gameObject.tag == "EnemyBullet")
+        {
+            Destroy(other);
             Destroy(gameObject);
         }
     }

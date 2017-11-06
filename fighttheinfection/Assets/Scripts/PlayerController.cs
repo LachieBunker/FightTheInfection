@@ -13,7 +13,7 @@ public class PlayerController : BaseCharacterClass {
 	// Use this for initialization
 	void Start ()
     {
-        
+        mat = gameObject.GetComponent<MeshRenderer>().material;
 	}
 	
 	// Update is called once per frame
@@ -62,11 +62,18 @@ public class PlayerController : BaseCharacterClass {
 
     public void Attack()
     {
-        GameObject bullet = (GameObject)Instantiate(bulletPrefab, new Vector3(transform.position.x + 1, transform.position.y, transform.position.z), Quaternion.Euler(0, 90, 0));
+        GameObject bullet = (GameObject)Instantiate(bulletPrefab, new Vector3(transform.position.x + 1, transform.position.y, transform.position.z + 0.75f), Quaternion.Euler(0, 90, 0));
+        bullet.GetComponent<BulletScript>().damage = damage;
+        bullet = (GameObject)Instantiate(bulletPrefab, new Vector3(transform.position.x + 1, transform.position.y, transform.position.z - 0.75f), Quaternion.Euler(0, 90, 0));
         bullet.GetComponent<BulletScript>().damage = damage;
     }
 
-    public IEnumerator SetInvul()
+    public void StartInvul()
+    {
+        StartCoroutine(SetInvul());
+    }
+
+    private IEnumerator SetInvul()
     {
         float timer = Time.time + invulDuration;
         invul = true;
@@ -78,6 +85,18 @@ public class PlayerController : BaseCharacterClass {
             mat.color = normalColor;
         }
         invul = false;
+    }
+
+    public override void CharacterHit(int _damage)
+    {
+        if(!invul)
+        {
+            currentHealth -= _damage;
+            if (currentHealth <= 0)
+            {
+                CharacterDead();
+            }
+        }
     }
 
     public override void CharacterDead()

@@ -7,16 +7,18 @@ public class EnemyClass : BaseCharacterClass {
     public bool usingAbility;
     public List<BaseEnemyAbilityClass> abilities;
     public float xDeSpawnBound;
+    public float abilityTimer;
+    public float abilityCoolDown;
 
 	// Use this for initialization
 	void Start () {
-		
+        SetEnemyAbilities();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(Time.time%0.5f == 0)
+        if(abilityTimer < Time.time)
         {
             for(int i = 0; i < abilities.Count; i++)
             {
@@ -35,6 +37,7 @@ public class EnemyClass : BaseCharacterClass {
                         abilities[i].Activate(gameObject, bulletPrefab);
                         abilities[i].Disable();
                         abilities[i].DelayRenabling();
+                        abilityTimer = Time.time + abilityCoolDown;
                     }
                 }
                 
@@ -48,10 +51,6 @@ public class EnemyClass : BaseCharacterClass {
         if(transform.position.x < -characterBounds.x)
         {
             transform.position = new Vector3(-characterBounds.x, transform.position.y, transform.position.z);
-        }
-        if (transform.position.x > characterBounds.x)
-        {
-            transform.position = new Vector3(characterBounds.x, transform.position.y, transform.position.z);
         }
         if (transform.position.z < -characterBounds.z)
         {
@@ -71,6 +70,16 @@ public class EnemyClass : BaseCharacterClass {
     public void SetEnemyAbilities(List<BaseEnemyAbilityClass> _abilities)
     {
         abilities = _abilities;
+    }
+
+    private void SetEnemyAbilities()
+    {
+        BaseEnemyAbilityClass[] _abilities = gameObject.GetComponents<BaseEnemyAbilityClass>();
+        abilities = new List<BaseEnemyAbilityClass>();
+        for(int i = 0; i < _abilities.Length; i++)
+        {
+            abilities.Add(_abilities[i]);
+        }
     }
 
     public void EnemyEscaped()
