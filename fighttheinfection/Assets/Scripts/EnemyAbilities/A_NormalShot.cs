@@ -21,7 +21,7 @@ public class A_NormalShot : BaseEnemyAbilityClass {
         Vector3 pos = new Vector3(_player.transform.position.x + (1 * dirFacing), _player.transform.position.y, _player.transform.position.z);
         Vector3 dir = Vector3.right * dirFacing;
         RaycastHit hit;
-        if(Physics.Raycast(pos, dir, out hit, 14))
+        if(Physics.Raycast(pos, dir, out hit))
         {
             //Debug.Log("Hit: " + hit.transform.gameObject);
             if(hit.transform.tag == "Player")

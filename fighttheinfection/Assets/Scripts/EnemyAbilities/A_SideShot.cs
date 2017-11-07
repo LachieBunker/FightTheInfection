@@ -20,17 +20,17 @@ public class A_SideShot : BaseEnemyAbilityClass {
         //Vector3 pos = new Vector3(_player.transform.position.x, _player.transform.position.y, _player.transform.position.z + 1);
         Vector3 dir = Vector3.left;
         RaycastHit hit;
-        if (Physics.Raycast(_player.transform.position, Vector3.left, out hit))
+        if (Physics.Raycast(_player.transform.position, Vector3.forward, out hit))
         {
-            Debug.Log("Hit: " + hit);
+            //Debug.Log("Hit: " + hit);
             if (hit.transform.tag == "Player")
             {
                 return true;
             }
         }
-        else if(Physics.Raycast(_player.transform.position, Vector3.right, out hit))
+        else if(Physics.Raycast(_player.transform.position, Vector3.back, out hit))
         {
-            Debug.Log("Hit: " + hit);
+            //Debug.Log("Hit: " + hit);
             if (hit.transform.tag == "Player")
             {
                 return true;
@@ -38,7 +38,7 @@ public class A_SideShot : BaseEnemyAbilityClass {
         }
         else
         {
-            Debug.Log("Didn't hit anything");
+            //Debug.Log("Didn't hit anything");
             return false;
         }
         return false;
@@ -47,7 +47,7 @@ public class A_SideShot : BaseEnemyAbilityClass {
 
     public override void Activate(GameObject _player, GameObject _bullet)
     {
-        Instantiate(_bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + 1), Quaternion.Euler(0, -90, 0));
-        Instantiate(_bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z - 1), Quaternion.Euler(0, 90, 0));
+        Instantiate(_bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z + 1), Quaternion.Euler(0, 0, 0));
+        Instantiate(_bullet, new Vector3(transform.position.x, transform.position.y, transform.position.z - 1), Quaternion.Euler(0, 180, 0));
     }
 }

@@ -248,7 +248,7 @@ public class GameManager : MonoBehaviour {
 
     public void GameOver(string gOCon)
     {
-
+        playing = false;
     }
 
     //Increase levelNum, and start prep for next level
