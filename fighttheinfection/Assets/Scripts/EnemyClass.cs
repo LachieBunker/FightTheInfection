@@ -9,18 +9,18 @@ public class EnemyClass : BaseCharacterClass {
     public float xDeSpawnBound;
     public float abilityTimer;
     public float abilityCoolDown;
-    public float invulTimer;
+    public bool invul;
 
 	// Use this for initialization
 	void Start () {
         SetEnemyAbilities();
-        invulTimer = Time.time + 1.8f;
+        invul = true;
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(abilityTimer < Time.time && Time.time > invulTimer)
+        if(abilityTimer < Time.time && !invul)
         {
             for(int i = 0; i < abilities.Count; i++)
             {
@@ -92,7 +92,7 @@ public class EnemyClass : BaseCharacterClass {
 
     public override void CharacterHit(int _damage)
     {
-        if (Time.time > invulTimer)
+        if (!invul)
         {
             currentHealth -= _damage;
             if (currentHealth <= 0)
@@ -106,6 +106,14 @@ public class EnemyClass : BaseCharacterClass {
     {
         GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().EnemyRemoved("Dead");
         Destroy(gameObject);
+    }
+
+    public void OnTriggerExit(Collider other)
+    {
+        if(other.transform.tag == "SpawnZone")
+        {
+            invul = false;
+        }
     }
 
     public void OnTriggerEnter(Collider other)
