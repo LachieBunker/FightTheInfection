@@ -105,7 +105,7 @@ public class EnemyFractalGenerator : MonoBehaviour {
         childScale = parent.childScale;
         transform.parent = parent.transform;
         transform.localScale = Vector3.one * childScale;
-        transform.localPosition = parent.childPos[childIndex].transform * (0.5f + 0.5f * childScale);
+        transform.localPosition = parent.childPos[childIndex].transform;// * (0.5f + 0.5f * childScale);
         transform.rotation = parent.transform.rotation;
         transform.localRotation = Quaternion.Euler(parent.childPos[childIndex].orientation.x, parent.childPos[childIndex].orientation.y, parent.childPos[childIndex].orientation.z);
         if(populate)

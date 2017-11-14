@@ -14,6 +14,7 @@ public class EnemyClass : BaseCharacterClass {
 	// Use this for initialization
 	void Start () {
         SetEnemyAbilities();
+        //bulletPrefab.GetComponent<MeshRenderer>().material = gameObject.GetComponentsInChildren<MeshRenderer>()[1].material;
         invul = true;
 	}
 	
