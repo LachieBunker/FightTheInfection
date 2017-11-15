@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour {
     //General properties
     public bool playing;
     public int levelNum;
+    public LevelMode levelMode;
     public DifficultyLevel difficulty;
     public int difficultyScaling;
     public float infectionLevel;
@@ -109,23 +110,28 @@ public class GameManager : MonoBehaviour {
         switch (infectionState)
         {
             case InfectionLevel.Healthy:
-                SetPlayerStats("Normal");
+                levelMode = LevelMode.Normal;
+                SetPlayerStats(levelMode);
                 break;
             case InfectionLevel.Sick:
-                SetPlayerStats("Normal");
+                levelMode = LevelMode.Normal;
+                SetPlayerStats(levelMode);
                 break;
             case InfectionLevel.VerySick:
                 float bonusLevelChance = Random.Range(0.0f, 100.0f);
                 if (bonusLevelChance < 50)
                 {
+                    levelMode = LevelMode.Bonus;
                     SetBonusLevel();
                 }
                 else
                 {
-                    SetPlayerStats("Normal");
+                    levelMode = LevelMode.Normal;
+                    SetPlayerStats(levelMode);
                 }
                 break;
             case InfectionLevel.DeathlySick:
+                levelMode = LevelMode.Bonus;
                 SetBonusLevel();
                 break;
         }
@@ -133,18 +139,18 @@ public class GameManager : MonoBehaviour {
 
     private void SetBonusLevel()
     {
-        SetPlayerStats("Bonus");
+        SetPlayerStats(levelMode);
     }
 
-    private void SetPlayerStats(string levelType)
+    private void SetPlayerStats(LevelMode mode)
     {
-        switch (levelType)
+        switch (mode)
         {
-            case "Normal":
+            case LevelMode.Normal:
                 maxLives = 3;
                 GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().attackCoolDownDuration = 0.25f;
                 break;
-            case "Bonus":
+            case LevelMode.Bonus:
                 maxLives = 3 + (5 - difficultyScaling);
                 float pAttackSpeed = 0.25f;
                 if(difficulty == DifficultyLevel.Easy)
@@ -221,7 +227,7 @@ public class GameManager : MonoBehaviour {
         {
             _numWaves--;
             SpawnWave();
-            yield return new WaitForSeconds(5 + ((waveSize/5) * 0.5f));//make faster as level increases?
+            yield return new WaitForSeconds(2 + ((waveSize/5) * 1.0f));//make faster as level increases?
             if(!playing)
             {
                 break;
@@ -259,11 +265,20 @@ public class GameManager : MonoBehaviour {
         {
             case "Dead":
                 
-                if(numRecentEnemyKills + numRecentEnemyEscapes == numRecentEnemiesCounted)
+                if(numRecentEnemyKills + numRecentEnemyEscapes > numRecentEnemiesCounted)
+                {
+                    numRecentEnemyKills++;
+                    numRecentEnemyEscapes = numRecentEnemiesCounted - numRecentEnemyKills;
+                    if(numRecentEnemyEscapes < 0)
+                    {
+                        numRecentEnemyEscapes = 0;
+                    }
+                }
+                else if (numRecentEnemyKills + numRecentEnemyEscapes == numRecentEnemiesCounted)
                 {
                     numRecentEnemyKills++;
                     numRecentEnemyEscapes--;
-                    if(numRecentEnemyEscapes < 0)
+                    if (numRecentEnemyEscapes < 0)
                     {
                         numRecentEnemyEscapes = 0;
                     }
@@ -274,10 +289,19 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             case "Escaped":
-                if (numRecentEnemyKills + numRecentEnemyEscapes == numRecentEnemiesCounted)
+                if (numRecentEnemyKills + numRecentEnemyEscapes > numRecentEnemiesCounted)
                 {
-                    numRecentEnemyEscapes+= 4;
-                    numRecentEnemyKills-= 4;
+                    numRecentEnemyEscapes+= 2;
+                    numRecentEnemyKills = numRecentEnemiesCounted - numRecentEnemyEscapes;
+                    if (numRecentEnemyKills < 0)
+                    {
+                        numRecentEnemyKills = 0;
+                    }
+                }
+                else if (numRecentEnemyKills + numRecentEnemyEscapes == numRecentEnemiesCounted)
+                {
+                    numRecentEnemyEscapes += 4;
+                    numRecentEnemyKills -= 4;
                     if (numRecentEnemyKills < 0)
                     {
                         numRecentEnemyKills = 0;
@@ -336,6 +360,7 @@ public class GameManager : MonoBehaviour {
     {
         GameObject _player = (GameObject)Instantiate(playerPrefab, playerSpawnPos, Quaternion.identity);
         _player.GetComponent<PlayerController>().StartInvul();
+        SetPlayerStats(levelMode);
     }
 
     public void UpdateUI()
@@ -386,3 +411,4 @@ public class GameManager : MonoBehaviour {
 
 public enum DifficultyLevel { Easy, Medium, Hard }
 public enum InfectionLevel { Healthy, Sick, VerySick, DeathlySick }
+public enum LevelMode { Normal, Bonus }

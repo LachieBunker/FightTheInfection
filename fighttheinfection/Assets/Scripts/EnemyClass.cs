@@ -19,7 +19,7 @@ public class EnemyClass : BaseCharacterClass {
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate()
     {
         if(abilityTimer < Time.time && !invul)
         {
