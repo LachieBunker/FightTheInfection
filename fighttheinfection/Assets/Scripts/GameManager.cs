@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
@@ -35,8 +36,9 @@ public class GameManager : MonoBehaviour {
 
     //Player
     public GameObject playerPrefab;
-    public int currentLives;
-    public int maxLives;
+    //public int currentLives;
+    //public int maxLives;
+    public bool playerDead;
     public Vector3 playerSpawnPos;
 
     //UI
@@ -69,6 +71,10 @@ public class GameManager : MonoBehaviour {
     //Set up the level before the game starts
     public void PreLevelSetup()
     {
+        if(playerDead)
+        {
+            RespawnPlayer();
+        }
         CheckStartLevelConditions();
         int addEnemyFrequency = 2;
         switch (difficulty)
@@ -101,7 +107,7 @@ public class GameManager : MonoBehaviour {
             GenerateEnemy();
         }
         SetLevelProperties();
-        currentLives = maxLives;
+        //currentLives = maxLives;
         StartLevel();
     }
 
@@ -147,11 +153,11 @@ public class GameManager : MonoBehaviour {
         switch (mode)
         {
             case LevelMode.Normal:
-                maxLives = 3;
+                //maxLives = 3;
                 GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().attackCoolDownDuration = 0.25f;
                 break;
             case LevelMode.Bonus:
-                maxLives = 3 + (5 - difficultyScaling);
+                //maxLives = 3 + (5 - difficultyScaling);
                 float pAttackSpeed = 0.25f;
                 if(difficulty == DifficultyLevel.Easy)
                 {
@@ -225,12 +231,23 @@ public class GameManager : MonoBehaviour {
         int _numWaves = numWaves;
         while(_numWaves > 0)
         {
-            _numWaves--;
-            SpawnWave();
-            yield return new WaitForSeconds(2 + ((waveSize/5) * 1.0f));//make faster as level increases?
-            if(!playing)
+            if(!playerDead)
             {
-                break;
+                _numWaves--;
+                SpawnWave();
+                yield return new WaitForSeconds(2 + ((waveSize / 5) * 1.0f));//make faster as level increases?
+            }
+            else
+            {
+                if (GameObject.FindGameObjectsWithTag("Enemy").Length <= 0)
+                {
+                    RespawnPlayer();
+                }
+                else
+                {
+                    Debug.Log("Still enemies");
+                    yield return new WaitForSeconds(0.5f);
+                }
             }
         }
         if(playing)
@@ -344,35 +361,29 @@ public class GameManager : MonoBehaviour {
     public void PlayerDead(GameObject _player)
     {
         Destroy(_player);
-        currentLives--;
+        playerDead = true;
         UpdateUI();
-        if(currentLives > 0)
-        {
-            RespawnPlayer();
-        }
-        else if(currentLives <= 0)
-        {
-            GameOver("Lost");
-        }
     }
 
     public void RespawnPlayer()
     {
         GameObject _player = (GameObject)Instantiate(playerPrefab, playerSpawnPos, Quaternion.identity);
         _player.GetComponent<PlayerController>().StartInvul();
+        playerDead = false;
         SetPlayerStats(levelMode);
     }
 
     public void UpdateUI()
     {
         levelText.text = "Night: " + levelNum;
-        livesText.text = "Lives: " + currentLives;
+        //livesText.text = "Lives: " + currentLives;
         infectionSlider.value = infectionLevel;
     }
 
     public void GameOver(string gOCon)
     {
         playing = false;
+        gOverCanvas.gameObject.SetActive(true);
     }
 
     //Increase levelNum, and start prep for next level
@@ -405,6 +416,28 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
         }
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0.0f;
+        PauseCanvas.gameObject.SetActive(true);
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1.0f;
+        PauseCanvas.gameObject.SetActive(false);
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void Menu()
+    {
+        SceneManager.LoadScene(0);
     }
 
 }
