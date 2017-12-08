@@ -8,14 +8,15 @@ public class BackgroundSwayer : MonoBehaviour {
 
     public string state;
 
-    public float dir, moveMax, rotMax, moveSpeed, rotSpeed;
-
+    public float dir, moveMax, rotMax, moveSpeed, rotSpeed, weighting, startBuffer;
+    
 	// Use this for initialization
 	void Start ()
     {
         startPos = transform.position;
         dir = 1;
         transform.Rotate(0, 0, rotMax, Space.Self);
+        transform.position = new Vector3(startPos.x, startPos.y + startBuffer, startPos.z);
         state = "Move";
 	}
 	
@@ -24,32 +25,28 @@ public class BackgroundSwayer : MonoBehaviour {
     {
         if(state == "Move")
         {
-            transform.Translate(0, moveSpeed * dir, 0);
+            transform.Translate(0, (moveSpeed * dir * weighting), 0);
             if (transform.position.y > startPos.y + moveMax)
             {
                 dir *= -1;
                 state = "Rotate";
-                Debug.Log("Top");
             }
             else if (transform.position.y < startPos.y - moveMax)
             {
                 dir *= -1;
                 state = "Rotate";
-                Debug.Log("Bottom");
             }
         }
         else if(state == "Rotate")
         {
-            transform.Rotate(0, 0, rotSpeed * dir, Space.Self);
-            if (transform.localEulerAngles.z > rotMax && transform.localEulerAngles.z < 180)
+            transform.Rotate(0, 0, (rotSpeed * dir * weighting), Space.Self);
+            if (transform.localEulerAngles.z > rotMax && transform.localEulerAngles.z < rotMax *2 && transform.position.y < startPos.y)
             {
-                Debug.Log("Moving" + transform.localEulerAngles.z);
                 state = "Move";
             }
-            else if(transform.localEulerAngles.z < 360-rotMax && transform.localEulerAngles.z > 180)
+            else if(transform.localEulerAngles.z < 360-rotMax && transform.localEulerAngles.z > 360-(rotMax*2))
             {
                 state = "Move";
-                Debug.Log(transform.localRotation.eulerAngles.z);
             }
         }
         
