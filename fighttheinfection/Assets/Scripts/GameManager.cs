@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
     public Vector3 waveSpawnSpacing;
     [Range(5,40)]
     public int waveSize;
-    [Range(10,20)]
+    [Range(3,5)]
     public int numWaves;
 
     //Player
@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour {
     public Text livesText;
     public GameObject PauseCanvas;
     public GameObject gOverCanvas;
+    public GameObject blackOutImage;
 
 
 	// Use this for initialization
@@ -145,6 +146,8 @@ public class GameManager : MonoBehaviour {
 
     private void SetBonusLevel()
     {
+        //display bonus level notification/ui
+        Debug.Log("Bonus Level");
         SetPlayerStats(levelMode);
     }
 
@@ -181,8 +184,26 @@ public class GameManager : MonoBehaviour {
         //Scale waveSize with infection level
         waveSize = (int)(waveSize + (waveSize * (infectionLevel/100)));
         Debug.Log("Scaled wave size is: " + waveSize);
-        numWaves = (int)(5 + (levelNum / 2));
-        numRecentEnemiesCounted = (waveSize) * 4;
+        numWaves = (int)(2 + (levelNum / 2));
+        if(numRecentEnemiesCounted > 0)
+        {
+            float recentKills = numRecentEnemyKills;
+            float recentEscapes = numRecentEnemyEscapes;
+            float recentCounted = numRecentEnemiesCounted;
+            float killsPercent = recentKills / recentCounted;
+            Debug.Log("kill percent: " + killsPercent);
+            Debug.Log("recent kills: " + recentKills);
+            Debug.Log("recent counted: " + recentCounted);
+            float escapesPercent = recentEscapes / recentCounted;
+            numRecentEnemiesCounted = (waveSize) * 4;
+            numRecentEnemyKills = (int)(numRecentEnemiesCounted * killsPercent);
+            numRecentEnemyEscapes = (int)(numRecentEnemiesCounted * escapesPercent);
+        }
+        else
+        {
+            numRecentEnemiesCounted = (waveSize) * 4;
+        }
+        
     }
 
     //Generate a new enemy to add to spawn list
@@ -340,6 +361,7 @@ public class GameManager : MonoBehaviour {
         float cap = numRecentEnemiesCounted;
         //Debug.Log(escapes/cap);
         infectionLevel = (float)(escapes / cap) * 100;
+        blackOutImage.GetComponent<RawImage>().color = new Color(0.6f, 0, 0, (infectionLevel/200));
         if(infectionLevel <= 20)
         {
             infectionState = InfectionLevel.Healthy;

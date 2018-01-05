@@ -14,6 +14,15 @@ public class EnemyClass : BaseCharacterClass {
 	// Use this for initialization
 	void Start () {
         SetEnemyAbilities();
+        float tempSpeed = moveSpeed + (GameObject.FindWithTag("GameManager").GetComponent<GameManager>().levelNum * 0.005f);
+        if(tempSpeed > 0.15f)
+        {
+            moveSpeed = 0.15f;
+        }
+        else
+        {
+            moveSpeed = tempSpeed;
+        }
         //bulletPrefab.GetComponent<MeshRenderer>().material = gameObject.GetComponentsInChildren<MeshRenderer>()[1].material;
         invul = true;
 	}
