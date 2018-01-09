@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : BaseCharacterClass {
 
+    public bool playing;
     public bool invul;
     public float invulDuration;
     public Material mat;
@@ -13,50 +14,55 @@ public class PlayerController : BaseCharacterClass {
 	// Use this for initialization
 	void Start ()
     {
+        playing = true;
         mat = gameObject.GetComponent<MeshRenderer>().material;
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate ()
     {
-		if(Input.GetKey(KeyCode.LeftArrow))
+        if(playing)
         {
-            transform.Translate(-moveSpeed, 0, 0);
-        }
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            transform.Translate(moveSpeed, 0, 0);
-        }
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            transform.Translate(0, 0, moveSpeed);
-        }
-        if (Input.GetKey(KeyCode.DownArrow))
-        {
-            transform.Translate(0, 0, -moveSpeed);
-        }
-        if (Input.GetKey(KeyCode.Space) && attackCoolDownTimer < Time.time)
-        {
-            attackCoolDownTimer = Time.time + attackCoolDownDuration;
-            Attack();
-        }
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                transform.Translate(-moveSpeed, 0, 0);
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                transform.Translate(moveSpeed, 0, 0);
+            }
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                transform.Translate(0, 0, moveSpeed);
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                transform.Translate(0, 0, -moveSpeed);
+            }
+            if (Input.GetKey(KeyCode.Space) && attackCoolDownTimer < Time.time)
+            {
+                attackCoolDownTimer = Time.time + attackCoolDownDuration;
+                Attack();
+            }
 
-        if (transform.position.x < -characterBounds.x)
-        {
-            transform.position = new Vector3(-characterBounds.x, transform.position.y, transform.position.z);
+            if (transform.position.x < -characterBounds.x)
+            {
+                transform.position = new Vector3(-characterBounds.x, transform.position.y, transform.position.z);
+            }
+            if (transform.position.x > characterBounds.x)
+            {
+                transform.position = new Vector3(characterBounds.x, transform.position.y, transform.position.z);
+            }
+            if (transform.position.z < -characterBounds.z)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, -characterBounds.z);
+            }
+            if (transform.position.z > characterBounds.z)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, characterBounds.z);
+            }
         }
-        if (transform.position.x > characterBounds.x)
-        {
-            transform.position = new Vector3(characterBounds.x, transform.position.y, transform.position.z);
-        }
-        if (transform.position.z < -characterBounds.z)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, -characterBounds.z);
-        }
-        if (transform.position.z > characterBounds.z)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, characterBounds.z);
-        }
+		
 
     }
 

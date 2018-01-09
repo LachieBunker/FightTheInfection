@@ -7,6 +7,7 @@ public class BackgroundMover : MonoBehaviour {
     public float moveSpeed;
     public float despawnX;
     public Vector3 respawnPos;
+    public bool respawn;
 
 	// Use this for initialization
 	void Start () {
@@ -20,7 +21,14 @@ public class BackgroundMover : MonoBehaviour {
 
         if(transform.position.x <= despawnX)
         {
-            transform.position = respawnPos;
+            if (respawn)
+            {
+                transform.position = respawnPos;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
 	}
 }

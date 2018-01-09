@@ -46,10 +46,11 @@ public class GameManager : MonoBehaviour {
     public Slider infectionSlider;
     public Text infectionText;
     public Text livesText;
+    public GameObject mainCanvas;
     public GameObject PauseCanvas;
     public GameObject gOverCanvas;
     public GameObject blackOutImage;
-
+    public GameObject bonusLevelAlert;
 
 	// Use this for initialization
 	void Start ()
@@ -109,7 +110,15 @@ public class GameManager : MonoBehaviour {
         }
         SetLevelProperties();
         //currentLives = maxLives;
-        StartLevel();
+        if(levelNum > 1)
+        {
+            StartCoroutine(DelayStartLevel(levelWaitDuration));
+        }
+        else
+        {
+            StartLevel();
+        }
+        
     }
 
     public void CheckStartLevelConditions()
@@ -148,6 +157,8 @@ public class GameManager : MonoBehaviour {
     {
         //display bonus level notification/ui
         Debug.Log("Bonus Level");
+        GameObject alert = (GameObject)Instantiate(bonusLevelAlert, mainCanvas.transform);
+        alert.transform.localPosition = new Vector3(1300, 150);
         SetPlayerStats(levelMode);
     }
 
@@ -240,6 +251,12 @@ public class GameManager : MonoBehaviour {
         return fractal;
     }
 
+    private IEnumerator DelayStartLevel(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        StartLevel();
+    }
+
     public void StartLevel()
     {
         Time.timeScale = 1.0f;
@@ -256,7 +273,7 @@ public class GameManager : MonoBehaviour {
             {
                 _numWaves--;
                 SpawnWave();
-                yield return new WaitForSeconds(2 + ((waveSize / 5) * 1.0f));//make faster as level increases?
+                yield return new WaitForSeconds(3 + ((waveSize / 5) * 1.0f));//make faster as level increases?
             }
             else
             {
@@ -405,19 +422,28 @@ public class GameManager : MonoBehaviour {
     public void GameOver(string gOCon)
     {
         playing = false;
+        GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().playing = false;
         gOverCanvas.gameObject.SetActive(true);
     }
 
     //Increase levelNum, and start prep for next level
     public void LevelOver()
     {
-        CheckEndLevelConditions();
-        levelNum++;
-        UpdateUI();
-        StartCoroutine(DelayLevelSetup(levelWaitDuration));
+        if(CheckEndLevelConditions())
+        {
+            GameOver("Lost");
+        }
+        else
+        {
+            levelNum++;
+            UpdateUI();
+            //PreLevelSetup();
+            StartCoroutine(DelayLevelSetup(2));
+        }
+        
     }
 
-    public void CheckEndLevelConditions()
+    public bool CheckEndLevelConditions()
     {
         switch(infectionState)
         {
@@ -434,10 +460,12 @@ public class GameManager : MonoBehaviour {
                 float deathChance = Random.Range(0.0f, 100.0f);
                 if (deathChance < 50)
                 {
-                    GameOver("Lost");
+                    return true;
+                    //GameOver("Lost");
                 }
                 break;
         }
+        return false;
     }
 
     public void PauseGame()
