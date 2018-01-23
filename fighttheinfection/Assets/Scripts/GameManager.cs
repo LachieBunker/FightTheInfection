@@ -221,14 +221,19 @@ public class GameManager : MonoBehaviour {
     public void GenerateEnemy()
     {
         GameObject enemy = (GameObject)Instantiate(enemyPrefab);
-        int numAbilities = (int)((levelNum / 5) * (difficultyScaling/2));
+        int numAbilities = (int)(Mathf.Clamp((levelNum/2), 1, 8) * (difficultyScaling/2));
+        Debug.Log("levelnum: " + levelNum / 2 + " Scaling: " + difficultyScaling / 2);
+        Debug.Log("enemy abilities: " + numAbilities);
         List<BaseEnemyAbilityClass> _abilities = new List<BaseEnemyAbilityClass>();
         if(numAbilities > 1)
         {
             for(int i = 1; i < numAbilities; i++)
             {
-                BaseEnemyAbilityClass ability = enemyAbilities[Random.Range(1, enemyAbilities.Count)];
-                enemy.AddComponent(ability.GetType());
+                BaseEnemyAbilityClass ability = getEnemyAbility(enemy);
+                if(ability != null)
+                {
+                    enemy.AddComponent(ability.GetType());
+                }
             }
         }
         //_abilities.Add(enemyAbilities[0]);//Add default attack to list
@@ -249,6 +254,43 @@ public class GameManager : MonoBehaviour {
         fractal.GetComponent<EnemyFractalGenerator>().SetValues(difficultyScaling, true);
         fractal.GetComponent<EnemyFractalGenerator>().Populate();
         return fractal;
+    }
+
+    private BaseEnemyAbilityClass getEnemyAbility(GameObject enemy)
+    {
+        BaseEnemyAbilityClass[] abilities = enemy.GetComponents<BaseEnemyAbilityClass>();
+        BaseEnemyAbilityClass randAbility = enemyAbilities[Random.Range(1, enemyAbilities.Count)];
+        int hits = 0;
+        foreach(BaseEnemyAbilityClass tempAbility in abilities)
+        {
+            if(tempAbility.GetType() == randAbility.GetType())
+            {
+                hits++;
+            }
+        }
+        if(hits == 0)
+        {
+            return randAbility;
+        }
+        else
+        {
+            for(int i = 1; i < enemyAbilities.Count; i++)
+            {
+                hits = 0;
+                foreach (BaseEnemyAbilityClass tempAbility in abilities)
+                {
+                    if (tempAbility.GetType() == enemyAbilities[i].GetType())
+                    {
+                        hits++;
+                    }
+                }
+                if (hits == 0)
+                {
+                    return enemyAbilities[i];
+                }
+            }
+        }
+        return null;
     }
 
     private IEnumerator DelayStartLevel(float delay)

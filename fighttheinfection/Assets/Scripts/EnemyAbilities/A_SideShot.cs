@@ -22,7 +22,7 @@ public class A_SideShot : BaseEnemyAbilityClass {
         RaycastHit hit;
         if (Physics.Raycast(_player.transform.position, Vector3.forward, out hit))
         {
-            //Debug.Log("Hit: " + hit);
+            Debug.Log("Forward Hit: " + hit.transform.gameObject);
             if (hit.transform.tag == "Player")
             {
                 return true;
@@ -30,7 +30,7 @@ public class A_SideShot : BaseEnemyAbilityClass {
         }
         else if(Physics.Raycast(_player.transform.position, Vector3.back, out hit))
         {
-            //Debug.Log("Hit: " + hit);
+            Debug.Log("Back Hit: " + hit);
             if (hit.transform.tag == "Player")
             {
                 return true;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class BackgroundSwayer : MonoBehaviour {
 
     private Vector3 startPos;
+    private float startX;
 
     public string state;
 
@@ -14,6 +15,7 @@ public class BackgroundSwayer : MonoBehaviour {
 	void Start ()
     {
         startPos = transform.position;
+        startX = transform.localPosition.x;
         dir = 1;
         transform.Rotate(0, 0, rotMax, Space.Self);
         transform.position = new Vector3(startPos.x, startPos.y + startBuffer, startPos.z);
@@ -25,7 +27,7 @@ public class BackgroundSwayer : MonoBehaviour {
     {
         if(state == "Move")
         {
-            transform.Translate(0, (moveSpeed * dir * weighting), 0);
+            transform.Translate(0, (moveSpeed * dir * weighting), 0, Space.Self);
             if (transform.position.y > startPos.y + moveMax)
             {
                 dir *= -1;
@@ -43,10 +45,12 @@ public class BackgroundSwayer : MonoBehaviour {
             if (transform.localEulerAngles.z > rotMax && transform.localEulerAngles.z < rotMax *2 && transform.position.y < startPos.y)
             {
                 state = "Move";
+                transform.localPosition = new Vector3(startX, transform.localPosition.y, transform.localPosition.z);
             }
             else if(transform.localEulerAngles.z < 360-rotMax && transform.localEulerAngles.z > 360-(rotMax*2))
             {
                 state = "Move";
+                transform.localPosition = new Vector3(startX, transform.localPosition.y, transform.localPosition.z);
             }
         }
         
